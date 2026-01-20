@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="mb-3">Metodologia usada en RiskGuard</h1>
+<p class="text-muted">Esta pantalla resume la metodologia que usa el sistema para evaluar riesgos. Puedes usarla como base para la presentacion y el documento tecnico.</p>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5">1) Valoracion de activos (CID)</h2>
+    <ul>
+      <li>C (Confidencialidad), I (Integridad), D (Disponibilidad) se califican de 1 a 3.</li>
+      <li>Se calcula <span class="fw-semibold">CID total = C + I + D</span> (rango 3 a 9).</li>
+      <li>Se traduce a impacto base: 3-4 -> 1 (bajo), 5-7 -> 3 (medio), 8-9 -> 5 (alto).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5">2) Identificacion de riesgos</h2>
+    <p class="text-muted mb-2">Un riesgo se registra como un escenario:</p>
+    <div class="alert alert-secondary mb-0">Activo + Amenaza + Vulnerabilidad (+ Controles existentes)</div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5">3) Valoracion del riesgo</h2>
+    <p class="mb-2">El sistema usa la formula clasica:</p>
+    <div class="alert alert-secondary">Riesgo (Score) = Probabilidad (1-5) x Impacto (1-5)</div>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <h3 class="h6">Escala de probabilidad (1-5)</h3>
+        <ol class="mb-0">
+          <li>Muy baja (controles solidos)</li>
+          <li>Baja (controles basicos)</li>
+          <li>Media (controles parciales)</li>
+          <li>Alta (controles debiles / alta exposicion)</li>
+          <li>Muy alta (ocurrencia esperada)</li>
+        </ol>
+      </div>
+      <div class="col-12 col-lg-6">
+        <h3 class="h6">Clasificacion por puntaje (1-25)</h3>
+        <ul class="mb-0">
+          <li>1-5: Bajo</li>
+          <li>6-10: Medio</li>
+          <li>11-15: Alto</li>
+          <li>16-25: Critico</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-3 small text-muted">Nota: si el escenario tiene un impacto distinto al del activo, puedes usar el campo <span class="fw-semibold">Impacto (override)</span>.</div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h5">4) Tratamiento</h2>
+    <p class="text-muted mb-2">Para cada riesgo se define una estrategia:</p>
+    <ul>
+      <li>Mitigar: bajar probabilidad o impacto con controles.</li>
+      <li>Transferir: pasar parte del riesgo a un tercero (contratos/seguros).</li>
+      <li>Aceptar: asumir el riesgo (con justificacion y aprobacion).</li>
+      <li>Evitar: eliminar la actividad o el servicio que genera el riesgo.</li>
+    </ul>
+    <p class="text-muted mb-0">En RiskGuard puedes asociar controles propuestos y anotar referencia ISO/IEC 27002:2022.</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="h5">5) Riesgo residual + Monitoreo</h2>
+    <ul>
+      <li>Despues de implementar controles, se registra P/I residual y se recalcula el score.</li>
+      <li>Se guarda fecha de implementacion y fecha de revision.</li>
+      <li>El panel muestra KPIs (porcentaje de riesgos altos/criticos con plan, riesgos aceptados con aprobacion, etc.).</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

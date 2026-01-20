@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="mb-0">Riesgos</h1>
+    <div class="text-muted">Registro de escenarios: Activo + Amenaza + Vulnerabilidad. Score = Probabilidad x Impacto.</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('risks_new') }}">+ Nuevo riesgo</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Escenario</th>
+      <th>P</th>
+      <th>I</th>
+      <th>Score</th>
+      <th>Nivel</th>
+      <th>Residual</th>
+      <th>Estrat.</th>
+      <th>Estado</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in risks %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>
+        <div class="fw-semibold">{{ r.asset.name }}</div>
+        <div class="small text-muted">Amenaza: {{ r.threat.name }} | Vuln.: {{ r.vulnerability.name }}</div>
+      </td>
+      <td>{{ r.probability }}</td>
+      <td>{{ r.impact_value() }}</td>
+      <td>{{ r.inherent_score() }}</td>
+      <td>
+        {% set lvl = r.inherent_level() %}
+        <span class="badge badge-level {% if lvl=='Critico' %}text-bg-danger{% elif lvl=='Alto' %}text-bg-warning{% elif lvl=='Medio' %}text-bg-primary{% else %}text-bg-success{% endif %}">{{ lvl }}</span>
+      </td>
+      <td>
+        {% if r.residual_score() %}
+          <div class="fw-semibold">{{ r.residual_score() }} ({{ r.residual_level() }})</div>
+        {% else %}
+          <span class="text-muted">-</span>
+        {% endif %}
+      </td>
+      <td>{{ r.treatment_strategy or '-' }}</td>
+      <td>
+        <span class="badge {% if r.status=='Implementado' %}text-bg-success{% elif r.status=='En progreso' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">{{ r.status }}</span>
+      </td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('risks_detail', risk_id=r.id) }}">Ver</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if not risks %}
+<div class="alert alert-info">Todavia no hay riesgos. Primero registra activos y catalogos, luego crea escenarios.</div>
+{% endif %}
+{% endblock %}

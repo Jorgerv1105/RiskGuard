@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_textarea %}
+{% block content %}
+<h1 class="mb-1">Tratamiento - Riesgo #{{ risk.id }}</h1>
+<div class="text-muted mb-3">Define estrategia, controles propuestos, responsables y estado. Referencia sugerida: ISO/IEC 27002:2022.</div>
+
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      {{ render_field(form.treatment_strategy) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.status) }}
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">{{ form.proposed_controls.label.text }}</label>
+      {{ form.proposed_controls(class_='form-select', size=6, multiple=true) }}
+      {% if form.proposed_controls.errors %}
+        <div class="text-danger small">{% for e in form.proposed_controls.errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+      <div class="form-text">Mantén presionada Ctrl (Windows) / Cmd (Mac) para seleccionar varios.</div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      {{ render_field(form.responsible) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.due_date) }}
+    </div>
+
+    <div class="col-12">
+      <div class="alert alert-warning">
+        <div class="fw-semibold">Si eliges "Aceptar"</div>
+        <div class="small">Completa justificación y aprobado por (idealmente Dirección). Esto suma puntos en la rubrica.</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.acceptance_justification) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.acceptance_approved_by) }}
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Guardar tratamiento</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('risks_detail', risk_id=risk.id) }}">Volver</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

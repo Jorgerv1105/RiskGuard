@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_textarea %}
+{% block content %}
+<h1 class="mb-3">{{ title }}</h1>
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      {{ render_field(form.name) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.category) }}
+    </div>
+    <div class="col-12">
+      {{ render_textarea(form.description) }}
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Guardar</button>
+      {% if title.lower().find('amenaza') != -1 %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('threats_list') }}">Cancelar</a>
+      {% else %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('vulnerabilities_list') }}">Cancelar</a>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}

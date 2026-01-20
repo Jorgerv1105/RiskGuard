@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="mb-1">Riesgo #{{ risk.id }}</h1>
+    <div class="text-muted">Escenario: <span class="fw-semibold">{{ risk.asset.name }}</span> + {{ risk.threat.name }} + {{ risk.vulnerability.name }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{{ url_for('risks_edit', risk_id=risk.id) }}">Editar escenario</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('risks_treatment', risk_id=risk.id) }}">Tratamiento</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('risks_residual', risk_id=risk.id) }}">Residual</a>
+    <form method="post" action="{{ url_for('risks_delete', risk_id=risk.id) }}" onsubmit="return confirm('Eliminar este riesgo?');">
+      {{ csrf_token() }}
+      <button class="btn btn-outline-danger" type="submit">Eliminar</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">Calculo inherente</h2>
+        <div class="row">
+          <div class="col-6">
+            <div class="text-muted small">Probabilidad (P)</div>
+            <div class="fs-4">{{ risk.probability }}</div>
+          </div>
+          <div class="col-6">
+            <div class="text-muted small">Impacto (I)</div>
+            <div class="fs-4">{{ risk.impact_value() }}</div>
+            {% if risk.impact_override %}<div class="small text-muted">(override manual)</div>{% endif %}
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-6">
+            <div class="text-muted small">Score</div>
+            <div class="fs-4">{{ risk.inherent_score() }}</div>
+          </div>
+          <div class="col-6">
+            <div class="text-muted small">Nivel</div>
+            {% set lvl = risk.inherent_level() %}
+            <div class="fs-4">
+              <span class="badge badge-level {% if lvl=='Critico' %}text-bg-danger{% elif lvl=='Alto' %}text-bg-warning{% elif lvl=='Medio' %}text-bg-primary{% else %}text-bg-success{% endif %}">{{ lvl }}</span>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+        <h3 class="h6">Activo y CID</h3>
+        <div class="small text-muted">C={{ risk.asset.confidentiality }}, I={{ risk.asset.integrity }}, D={{ risk.asset.availability }} | CID={{ risk.asset.cid_total }} | Impacto activo={{ risk.asset.impact_value }}</div>
+
+        <hr>
+        <h3 class="h6">Controles existentes</h3>
+        <div class="text-muted">{{ risk.existing_controls or 'Sin registro' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">Tratamiento</h2>
+        <div class="mb-2"><span class="text-muted">Estrategia:</span> <span class="fw-semibold">{{ risk.treatment_strategy or '-' }}</span></div>
+        <div class="mb-2"><span class="text-muted">Responsable:</span> {{ risk.responsible or '-' }}</div>
+        <div class="mb-2"><span class="text-muted">Fecha limite:</span> {{ risk.due_date or '-' }}</div>
+        <div class="mb-3"><span class="text-muted">Estado:</span> <span class="badge {% if risk.status=='Implementado' %}text-bg-success{% elif risk.status=='En progreso' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">{{ risk.status }}</span></div>
+
+        <h3 class="h6">Controles propuestos</h3>
+        {% if risk.proposed_controls %}
+          <ul>
+            {% for c in risk.proposed_controls %}
+              <li>{{ c.name }}{% if c.iso_reference %} <span class="text-muted">({{ c.iso_reference }})</span>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">-</div>
+        {% endif %}
+
+        {% if risk.treatment_strategy == 'Aceptar' %}
+          <hr>
+          <h3 class="h6">Aprobacion de aceptacion</h3>
+          <div class="text-muted"><span class="fw-semibold">Justificacion:</span> {{ risk.acceptance_justification or '-' }}</div>
+          <div class="text-muted"><span class="fw-semibold">Aprobado por:</span> {{ risk.acceptance_approved_by or '-' }}</div>
+        {% endif %}
+
+        <hr>
+        <h2 class="h5">Residual</h2>
+        {% if risk.residual_score() %}
+          <div class="mb-2"><span class="text-muted">P residual:</span> {{ risk.residual_probability or '-' }}</div>
+          <div class="mb-2"><span class="text-muted">I residual:</span> {{ risk.residual_impact or '-' }}</div>
+          <div class="mb-2"><span class="text-muted">Score residual:</span> <span class="fw-semibold">{{ risk.residual_score() }}</span> ({{ risk.residual_level() }})</div>
+          <div class="mb-2"><span class="text-muted">Fecha implementacion:</span> {{ risk.completed_at or '-' }}</div>
+          <div class="mb-2"><span class="text-muted">Ultima revision:</span> {{ risk.last_review_at.date() if risk.last_review_at else '-' }}</div>
+        {% else %}
+          <div class="text-muted">Todavia no se ha evaluado el riesgo residual.</div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">Comunicacion y consulta</h2>
+        <div class="text-muted">{{ risk.observations or 'Sin observaciones' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Incidentes relacionados</h2>
+          <a class="btn btn-sm btn-primary" href="{{ url_for('incidents_new', risk_id=risk.id) }}">+ Registrar incidente</a>
+        </div>
+        <hr>
+        {% if risk.incidents %}
+          <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Severidad</th>
+                <th>Descripcion</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inc in risk.incidents %}
+              <tr>
+                <td>{{ inc.date }}</td>
+                <td>{{ inc.severity or '-' }}</td>
+                <td>{{ inc.description }}</td>
+                <td class="text-end">
+                  <form method="post" action="{{ url_for('incidents_delete', incident_id=inc.id) }}" onsubmit="return confirm('Eliminar incidente?');">
+                    {{ csrf_token() }}
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          </div>
+        {% else %}
+          <div class="text-muted">No hay incidentes registrados.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

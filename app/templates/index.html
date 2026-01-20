@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="mb-3">Panel de monitoreo</h1>
+<p class="text-muted">Resumen rapido del estado de riesgos y controles.</p>
+
+<div class="row g-3">
+  {% for k in kpis %}
+  <div class="col-12 col-md-4 col-lg-3">
+    <div class="card card-kpi">
+      <div class="card-body">
+        <div class="fw-semibold">{{ k.label }}</div>
+        <div class="display-6">{{ k.value }}</div>
+        {% if k.note %}<div class="small-muted">{{ k.note }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<hr class="my-4">
+<h2 class="h4">Top riesgos (por severidad inherente)</h2>
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Activo</th>
+      <th>Amenaza</th>
+      <th>Vulnerabilidad</th>
+      <th>Score</th>
+      <th>Nivel</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in top_risks %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.asset.name }}</td>
+      <td>{{ r.threat.name }}</td>
+      <td>{{ r.vulnerability.name }}</td>
+      <td>{{ r.inherent_score() }}</td>
+      <td>
+        {% set lvl = r.inherent_level() %}
+        <span class="badge badge-level {% if lvl=='Critico' %}text-bg-danger{% elif lvl=='Alto' %}text-bg-warning{% elif lvl=='Medio' %}text-bg-primary{% else %}text-bg-success{% endif %}">{{ lvl }}</span>
+      </td>
+      <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('risks_detail', risk_id=r.id) }}">Ver</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

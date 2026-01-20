@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_textarea %}
+{% block content %}
+<h1 class="mb-3">Nuevo riesgo</h1>
+
+<div class="alert alert-secondary">
+  <div class="fw-semibold">Como se calcula</div>
+  <div class="small text-muted">Score = Probabilidad (1-5) x Impacto (1-5). Si no eliges impacto manual, el sistema usa el impacto del activo (derivado del CID).</div>
+  <div class="small text-muted">Tip: el campo <span class="fw-semibold">Impacto (opcional)</span> te sirve si el escenario es mas grave o mas leve que el impacto general del activo.</div>
+</div>
+
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12">
+      {{ render_field(form.asset_id) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.threat_id) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.vulnerability_id) }}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {{ render_field(form.probability) }}
+    </div>
+    <div class="col-12 col-md-8">
+      {{ render_field(form.impact_override) }}
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.existing_controls) }}
+      <div class="form-text">Escribe los controles actuales (si existen). Esto ayuda a justificar la probabilidad.</div>
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.observations) }}
+      <div class="form-text">Aqui puedes dejar observaciones/recomendaciones iniciales para comunicacion y consulta.</div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Crear riesgo</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('risks_list') }}">Cancelar</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

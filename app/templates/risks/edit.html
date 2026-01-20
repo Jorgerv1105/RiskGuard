@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_textarea %}
+{% block content %}
+<h1 class="mb-3">Editar escenario - Riesgo #{{ risk.id }}</h1>
+
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12">
+      {{ render_field(form.asset_id) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.threat_id) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.vulnerability_id) }}
+    </div>
+
+    <div class="col-12 col-md-4">
+      {{ render_field(form.probability) }}
+    </div>
+    <div class="col-12 col-md-8">
+      {{ render_field(form.impact_override) }}
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.existing_controls) }}
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.observations) }}
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Guardar cambios</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('risks_detail', risk_id=risk.id) }}">Cancelar</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

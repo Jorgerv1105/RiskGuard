@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_textarea %}
+{% block content %}
+<h1 class="mb-3">{{ title }}</h1>
+
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      {{ render_field(form.name) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.asset_type) }}
+    </div>
+
+    <div class="col-12 col-md-6">
+      {{ render_field(form.process_area) }}
+    </div>
+    <div class="col-12 col-md-6">
+      {{ render_field(form.owner) }}
+    </div>
+
+    <div class="col-12">
+      {{ render_textarea(form.description) }}
+    </div>
+
+    <div class="col-12">
+      <div class="alert alert-secondary">
+        <div class="fw-semibold mb-1">Valoracion CID (1-3 cada uno)</div>
+        <div class="small text-muted">C = Confidencialidad, I = Integridad, D = Disponibilidad. El sistema suma CID (3-9) y lo traduce a impacto: 3-4 -> 1, 5-7 -> 3, 8-9 -> 5.</div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      {{ render_field(form.confidentiality) }}
+    </div>
+    <div class="col-12 col-md-4">
+      {{ render_field(form.integrity) }}
+    </div>
+    <div class="col-12 col-md-4">
+      {{ render_field(form.availability) }}
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Guardar</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('assets_list') }}">Cancelar</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

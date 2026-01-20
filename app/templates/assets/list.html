@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="mb-0">Activos</h1>
+    <div class="text-muted">Inventario y valoracion CID (C/I/D). El impacto se calcula automaticamente.</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('assets_new') }}">+ Nuevo activo</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Activo</th>
+      <th>Tipo</th>
+      <th>Proceso/Area</th>
+      <th>Responsable</th>
+      <th>C</th>
+      <th>I</th>
+      <th>D</th>
+      <th>CID</th>
+      <th>Impacto</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in assets %}
+    <tr>
+      <td>{{ a.id }}</td>
+      <td>
+        <div class="fw-semibold">{{ a.name }}</div>
+        {% if a.description %}<div class="text-muted small">{{ a.description }}</div>{% endif %}
+      </td>
+      <td>{{ a.asset_type }}</td>
+      <td>{{ a.process or '-' }}</td>
+      <td>{{ a.owner or '-' }}</td>
+      <td>{{ a.confidentiality }}</td>
+      <td>{{ a.integrity }}</td>
+      <td>{{ a.availability }}</td>
+      <td>{{ a.cid_total }}</td>
+      <td>
+        {% set imp = a.impact_value %}
+        <span class="badge {% if imp==5 %}text-bg-danger{% elif imp==3 %}text-bg-warning{% else %}text-bg-success{% endif %}">
+          {{ imp }}
+        </span>
+      </td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('assets_edit', asset_id=a.id) }}">Editar</a>
+        <form class="d-inline" method="post" action="{{ url_for('assets_delete', asset_id=a.id) }}" onsubmit="return confirm('Eliminar este activo?');">
+          {{ csrf_token() }}
+          <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if not assets %}
+<div class="alert alert-info">Aun no tienes activos. Crea uno para empezar.</div>
+{% endif %}
+{% endblock %}
